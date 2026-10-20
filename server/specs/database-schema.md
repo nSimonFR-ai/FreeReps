@@ -392,6 +392,53 @@ CREATE TABLE ingest_checkpoints (
 );
 ```
 
+### `climbing_sessions` (Regular)
+
+Sessions pushed through `POST /api/v1/ingest/climbing`
+([`climbing-ingest.md`](climbing-ingest.md)). `external_id` is the session's id
+in `source`, the logbook app. `end_time` is NULL when the app records no end.
+Kept apart from `workouts`: a logbook session has no duration, energy or heart
+rate of its own.
+
+```sql
+CREATE TABLE climbing_sessions (
+    user_id     INTEGER     NOT NULL REFERENCES users(id),
+    source      TEXT        NOT NULL,
+    external_id TEXT        NOT NULL,
+    start_time  TIMESTAMPTZ NOT NULL,
+    end_time    TIMESTAMPTZ,
+    gym         TEXT        NOT NULL DEFAULT '',
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, source, external_id)
+);
+```
+
+### `climbing_ascents` (Regular)
+
+The routes of a `climbing_sessions` row, one per route. `result` is `flash`,
+`top`, `repeat` or `attempt`. `grade` is the gym's own label, untranslated;
+`grade_rank` orders it within that gym's scale only. `attempts` is NULL when the
+app does not count them.
+
+```sql
+CREATE TABLE climbing_ascents (
+    user_id             INTEGER NOT NULL,
+    source              TEXT    NOT NULL,
+    session_external_id TEXT    NOT NULL,
+    route_external_id   TEXT    NOT NULL,
+    discipline          TEXT    NOT NULL DEFAULT 'boulder',
+    result              TEXT    NOT NULL CHECK (result IN ('flash', 'top', 'repeat', 'attempt')),
+    grade               TEXT    NOT NULL DEFAULT '',
+    grade_rank          INTEGER,
+    color               TEXT    NOT NULL DEFAULT '',
+    name                TEXT    NOT NULL DEFAULT '',
+    attempts            INTEGER,
+    PRIMARY KEY (user_id, source, session_external_id, route_external_id),
+    FOREIGN KEY (user_id, source, session_external_id)
+        REFERENCES climbing_sessions (user_id, source, external_id) ON DELETE CASCADE
+);
+```
+
 ## Deduplication Strategy
 
 Unique constraints on natural keys prevent duplicate data from repeated syncs.
@@ -406,6 +453,11 @@ within one call keep the last occurrence. The count returned to the client as
 
 `activity_summaries` upserts on `(user_id, date)` the same way: a day's
 summary grows until the day ends and is sent on every sync.
+
+`climbing_sessions` and `climbing_ascents` are replaced per session: an ingest
+upserts the session row, deletes its ascents and inserts the ones sent, in one
+transaction, so a route corrected in the app after an earlier push is corrected
+here too.
 
 The other tables use `INSERT ... ON CONFLICT DO NOTHING`; their keys are the
 UUIDs of HealthKit samples, which do not change once written.

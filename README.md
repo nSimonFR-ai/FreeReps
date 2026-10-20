@@ -351,6 +351,19 @@ instant is part of a row's natural key. `ingest.session_timezone` in
 host that imports the same export — reading one export in two zones stores every
 session twice ([`INCIDENTS.md`](INCIDENTS.md), 2026-08-10).
 
+### Climbing logbooks
+
+Bouldering and climbing gyms keep their own logbooks — which routes were
+topped, flashed or tried, at which grade. A client that reads such an app
+pushes its sessions to `/api/v1/ingest/climbing`; the format is
+[`server/specs/climbing-ingest.md`](server/specs/climbing-ingest.md). Each push
+replaces the sessions it names, so a route logged after the first push is
+picked up by the next one.
+
+Grades are stored as the gym labels them and are never converted between
+scales. The sessions are kept apart from workouts: an Apple Watch climbing
+workout and the logbook session of the same visit are two records.
+
 ## Supported Metrics
 
 124 metric names are on the allowlist. `GET /api/v1/metrics/available` returns
@@ -393,13 +406,13 @@ There is no SSE endpoint. `/mcp/sse` matches no route, so the request reaches
 the dashboard handler and the response is HTML — which a client reports as a
 protocol error rather than as a wrong URL.
 
-**Tools (20):**
+**Tools (21):**
 
 | Group | Tools |
 |---|---|
 | Metrics | `get_health_metrics`, `get_metric_stats`, `list_available_metrics`, `get_correlation`, `compare_periods` |
 | Sleep | `get_sleep_data`, `get_sleep_summary` |
-| Workouts | `get_workouts`, `get_workout_sets` |
+| Workouts | `get_workouts`, `get_workout_sets`, `get_climbing_sessions` |
 | Strength | `get_strength_summary`, `get_strength_volume`, `get_strength_intensity`, `get_strength_1rm` |
 | Clinical records | `get_ecg_recordings`, `get_audiograms`, `get_medications`, `get_vision_prescriptions` |
 | Other samples | `get_activity_summaries`, `get_state_of_mind`, `get_category_samples` |
@@ -661,6 +674,7 @@ an identity, so a health check needs no credentials.
 | `/api/v1/ingest/` | POST | Ingest health data JSON (Health Auto Export REST; the iOS app with `X-FreeReps-Client: freereps-ios`) |
 | `/api/v1/sync-state` | GET | Where the calling client's stored data ends, per domain (see `server/specs/hae-rest-api.md`) |
 | `/api/v1/ingest/alpha` | POST | Ingest Alpha Progression CSV |
+| `/api/v1/ingest/climbing` | POST | Ingest climbing logbook sessions (see `server/specs/climbing-ingest.md`) |
 | `/api/v1/import` | POST | Unified import (auto-detects format) |
 | `/api/v1/import/hae-tcp/check` | POST | Probe a Health Auto Export TCP server |
 | `/api/v1/import/hae-tcp` | POST/DELETE | Start or cancel a TCP backfill |
@@ -680,6 +694,7 @@ an identity, so a health check needs no credentials.
 | `/api/v1/workouts/zones` | GET | Heart rate zone distribution |
 | `/api/v1/workouts/{id}` | GET | Workout detail |
 | `/api/v1/workouts/{id}/sets` | GET | Strength sets of a session |
+| `/api/v1/climbing/sessions` | GET | Climbing sessions with their ascents |
 | `/api/v1/training-metrics/rebuild` | POST | Recompute the derived training series |
 | `/api/v1/ecg` | GET | ECG recordings |
 | `/api/v1/audiograms` | GET | Audiograms |

@@ -308,6 +308,38 @@ export async function fetchWorkouts(
   return res.json();
 }
 
+/** One route of a climbing session (server/specs/climbing-ingest.md). */
+export interface ClimbingAscent {
+  route_id: string;
+  discipline: string;
+  result: "flash" | "top" | "repeat" | "attempt";
+  grade: string;
+  /** Orders grades within one gym's scale only. */
+  grade_rank: number | null;
+  color: string;
+  name: string;
+  attempts: number | null;
+}
+
+export interface ClimbingSession {
+  source: string;
+  id: string;
+  start: string;
+  end: string | null;
+  gym: string;
+  ascents: ClimbingAscent[];
+}
+
+export async function fetchClimbingSessions(
+  start: string,
+  end: string,
+): Promise<ClimbingSession[]> {
+  const params = new URLSearchParams({ start, end });
+  const res = await fetch(`${BASE}/climbing/sessions?${params}`);
+  if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
 /** One session's share of time per heart rate zone, five fractions summing to 1. */
 export interface WorkoutZones {
   workout_id: string;

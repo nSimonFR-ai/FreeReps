@@ -4,7 +4,7 @@
 
 **`specs/` is the source of truth for wire formats** — `hae-export-format.md`,
 `hae-rest-api.md`, `alpha-progression.md`, `hevy-api.md`, `withings-api.md`,
-`database-schema.md`. Read the spec before changing an ingest path. *Why:* the
+`climbing-ingest.md`, `database-schema.md`. Read the spec before changing an ingest path. *Why:* the
 payloads come from third-party apps whose shape is not derivable from this repo,
 and a mismatch surfaces as silently dropped rows rather than an error (see
 [`INCIDENTS.md`](../INCIDENTS.md), 2026-04-08).

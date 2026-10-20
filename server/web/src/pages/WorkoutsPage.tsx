@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchWorkoutZones, fetchWorkouts, type Workout } from "../api";
 import PageHeader from "../components/PageHeader";
 import RangeControl from "../components/RangeControl";
@@ -215,7 +215,19 @@ export default function WorkoutsPage() {
             {typeFilter ? `Filtered to ${typeFilter}` : "All types"} · newest
             first
           </span>
-        ) : null}
+        ) : (
+          <Link
+            to="/climbing"
+            style={{
+              marginLeft: "auto",
+              font: "500 12px var(--font-body)",
+              color: "var(--color-neutral-600)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Climbing →
+          </Link>
+        )}
       </div>
 
       {message ? (

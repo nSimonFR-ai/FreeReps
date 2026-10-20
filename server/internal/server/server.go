@@ -11,6 +11,7 @@ import (
 	"github.com/claude/freereps/internal/alerts"
 	"github.com/claude/freereps/internal/hevy"
 	"github.com/claude/freereps/internal/ingest/alpha"
+	"github.com/claude/freereps/internal/ingest/climbing"
 	"github.com/claude/freereps/internal/ingest/health"
 	freerepsmcp "github.com/claude/freereps/internal/mcp"
 	"github.com/claude/freereps/internal/oura"
@@ -26,6 +27,7 @@ type Server struct {
 	db     *storage.DB
 	health *health.Provider
 	alpha  *alpha.Provider
+	climbing *climbing.Provider
 	log    *slog.Logger
 	lc     *local.Client
 	router chi.Router
@@ -138,6 +140,7 @@ func New(db *storage.DB, healthProvider *health.Provider, alphaProvider *alpha.P
 		db:     db,
 		health: healthProvider,
 		alpha:  alphaProvider,
+		climbing: climbing.NewProvider(db),
 		log:    log,
 		router: chi.NewRouter(),
 	}
@@ -203,6 +206,7 @@ func (s *Server) routes() {
 		r.Route("/api/v1/ingest", func(r chi.Router) {
 			r.Post("/", s.handleIngest)
 			r.Post("/alpha", s.handleAlphaIngest)
+			r.Post("/climbing", s.handleClimbingIngest)
 		})
 		r.Get("/api/v1/sync-state", s.handleSyncState)
 
@@ -220,6 +224,7 @@ func (s *Server) routes() {
 		r.Get("/api/v1/workouts/zones", s.handleWorkoutZones)
 		r.Get("/api/v1/workouts/{id}", s.handleGetWorkout)
 		r.Get("/api/v1/workouts/{id}/sets", s.handleWorkoutSets)
+		r.Get("/api/v1/climbing/sessions", s.handleQueryClimbingSessions)
 		r.Get("/api/v1/metrics/stats", s.handleMetricStats)
 		r.Get("/api/v1/timeseries", s.handleTimeSeries)
 		r.Get("/api/v1/correlation", s.handleCorrelation)

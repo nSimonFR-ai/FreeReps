@@ -8,13 +8,15 @@ const NAV_ITEMS = [
   { to: "/", label: "Today", end: true },
   { to: "/sleep", label: "Sleep" },
   { to: "/workouts", label: "Workouts" },
+  { to: "/climbing", label: "Climbing" },
   { to: "/metrics", label: "Metrics" },
   { to: "/correlations", label: "Correlations" },
   { to: "/trends", label: "Trends" },
 ];
 
 /* Metrics and Correlations are absent: they need width the phone does not have,
-   so below 768px they stay reachable by URL only. Settings sits under More. */
+   so below 768px they stay reachable by URL only. Settings sits under More;
+   Climbing is linked from the Workouts screen. */
 const TAB_ITEMS = [
   { to: "/", label: "Today", end: true },
   { to: "/sleep", label: "Sleep" },

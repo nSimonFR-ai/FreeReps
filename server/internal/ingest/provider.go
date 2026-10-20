@@ -19,6 +19,10 @@ type Result struct {
 	SetsReceived int   `json:"sets_received"`
 	SetsInserted int64 `json:"sets_inserted"`
 
+	ClimbingSessionsReceived int   `json:"climbing_sessions_received,omitempty"`
+	ClimbingAscentsReceived  int   `json:"climbing_ascents_received,omitempty"`
+	ClimbingAscentsInserted  int64 `json:"climbing_ascents_inserted,omitempty"`
+
 	ECGRecordingsInserted    int   `json:"ecg_recordings_inserted,omitempty"`
 	AudiogramsInserted       int   `json:"audiograms_inserted,omitempty"`
 	ActivitySummariesInserted int64 `json:"activity_summaries_inserted,omitempty"`

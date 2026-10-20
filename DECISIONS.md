@@ -19,6 +19,38 @@ is as recorded there; where the record named no alternative, none is claimed.
 
 ---
 
+## 2026-10-20 — Climbing logbooks are pushed into tables of their own, one session replaced at a time
+
+**Decided:** 2026-10-20
+
+**Decision.** Sessions from a climbing logbook app arrive through
+`POST /api/v1/ingest/climbing` in a format FreeReps defines
+(`server/specs/climbing-ingest.md`) and land in `climbing_sessions` and
+`climbing_ascents`. Each push replaces the sessions it names, ascents included.
+Grades are stored as the gym labels them, with an optional client-supplied rank
+that orders them within that gym's scale only.
+
+**Reasoning.** The first source, Arkose+, has no public API; its data is
+reachable only with the app's own login, so polling it from the server would put
+that login into FreeReps. A push endpoint keeps it in the client, and the
+endpoint sits behind the tailnet identity like every other route — the objection
+that rejected Hevy's webhook (2026-08-04: a public endpoint with its own auth)
+does not apply. The two existing homes do not fit. A `workouts` row needs an
+end, and Arkose+ records one for 1 of 23 sessions measured on 2026-10-20;
+`workout_sets` models weight times reps and feeds the tonnage series, which a
+route would corrupt. Replacing per session follows Hevy's delete-then-insert
+(2026-08-04): the app is edited after the first push — tops are logged during
+the visit — and `ON CONFLICT DO NOTHING` would keep the first version. No
+conversion between grade scales: a converted grade is a judgement, which
+"Data and visualization, no computed scores" (2026-02-19) keeps out.
+
+**Trigger to re-open.** A second logbook source whose sessions span several
+gyms or whose routes repeat within one session, which the per-session route key
+cannot hold; or pairing with Apple Health climbing workouts (`ROADMAP.md`)
+needing a stored link rather than a match at read time.
+
+---
+
 ## 2026-10-14 — CI rebuilds weekly and govulncheck blocks
 
 **Decided:** 2026-10-14

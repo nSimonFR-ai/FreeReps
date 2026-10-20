@@ -112,6 +112,12 @@ var toolGetWorkoutSets = newReadTool("get_workout_sets",
 	mcp.WithString("exercise", mcp.Description("Filter by exercise name (partial match, e.g. 'bench press')")),
 )
 
+var toolGetClimbingSessions = newReadTool("get_climbing_sessions",
+	mcp.WithDescription("FreeReps database: climbing sessions from a gym logbook app, each with its routes — result (flash, top, repeat, attempt), the grade as the gym labels it, and grade_rank, which orders grades within that gym's scale only. Grades are not comparable across gyms."),
+	mcp.WithString("start", mcp.Description(descStart + " Defaults to 7 days ago.")),
+	mcp.WithString("end", mcp.Description(descEnd + " Defaults to now.")),
+)
+
 var toolListAvailableMetrics = newReadTool("list_available_metrics",
 	mcp.WithDescription("List every health metric with its category, enabled status, display_unit, display_multiplier and is_cumulative. The other tools return stored values: multiply by display_multiplier to get display_unit (e.g. a stored fraction becomes a percentage), and read is_cumulative to know whether an avg field is a total."),
 )
@@ -361,6 +367,25 @@ func (h *handlers) getWorkoutSets(ctx context.Context, req mcp.CallToolRequest) 
 	}
 
 	result, err := mcp.NewToolResultJSON(map[string]any{"data": sets})
+	if err != nil {
+		return mcp.NewToolResultError("serialization failed"), nil
+	}
+	return result, nil
+}
+
+func (h *handlers) getClimbingSessions(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	start, end, err := defaultTimeRange(req.GetString("start", ""), req.GetString("end", ""))
+	if err != nil {
+		return mcp.NewToolResultError("invalid date format: " + err.Error()), nil
+	}
+
+	sessions, err := h.ds.QueryClimbingSessions(ctx, start, end, UserIDFromContext(ctx))
+	if err != nil {
+		h.log.Error("mcp get_climbing_sessions", "error", err)
+		return mcp.NewToolResultError("query failed: " + err.Error()), nil
+	}
+
+	result, err := mcp.NewToolResultJSON(map[string]any{"data": sessions})
 	if err != nil {
 		return mcp.NewToolResultError("serialization failed"), nil
 	}

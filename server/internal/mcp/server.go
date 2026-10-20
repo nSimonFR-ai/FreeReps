@@ -44,6 +44,7 @@ func New(ds *storage.DB, version string, log *slog.Logger) *server.MCPServer {
 		server.ServerTool{Tool: toolGetSleepData, Handler: h.getSleepData},
 		server.ServerTool{Tool: toolGetWorkouts, Handler: h.getWorkouts},
 		server.ServerTool{Tool: toolGetWorkoutSets, Handler: h.getWorkoutSets},
+		server.ServerTool{Tool: toolGetClimbingSessions, Handler: h.getClimbingSessions},
 		server.ServerTool{Tool: toolListAvailableMetrics, Handler: h.listAvailableMetrics},
 		server.ServerTool{Tool: toolComparePeriods, Handler: h.comparePeriods},
 		server.ServerTool{Tool: toolGetStrengthSummary, Handler: h.getStrengthSummary},

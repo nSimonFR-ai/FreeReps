@@ -8,6 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 const SleepPage = lazy(() => import("./pages/SleepPage"));
 const WorkoutsPage = lazy(() => import("./pages/WorkoutsPage"));
 const WorkoutDetailPage = lazy(() => import("./pages/WorkoutDetailPage"));
+const ClimbingPage = lazy(() => import("./pages/ClimbingPage"));
 const MetricsPage = lazy(() => import("./pages/MetricsPage"));
 const CorrelationPage = lazy(() => import("./pages/CorrelationPage"));
 const TrendsPage = lazy(() => import("./pages/TrendsPage"));
@@ -56,6 +57,14 @@ export default function App() {
           element={
             <Page>
               <WorkoutsPage />
+            </Page>
+          }
+        />
+        <Route
+          path="/climbing"
+          element={
+            <Page>
+              <ClimbingPage />
             </Page>
           }
         />

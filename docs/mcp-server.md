@@ -125,6 +125,19 @@ Strength training set data from Hevy and from imported Alpha Progression exports
 
 Returns per-set detail: exercise name, weight, reps, RIR, equipment.
 
+### get_climbing_sessions
+
+Climbing sessions from a gym logbook app, newest first, each with its routes.
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `start` | no | 7 days ago | Start date |
+| `end` | no | now | End date |
+
+Returns per session: source, gym, start, end (often null), and ascents with
+result (`flash`, `top`, `repeat`, `attempt`), grade as the gym labels it, and
+`grade_rank`, which orders grades within that gym's scale only.
+
 ### compare_periods
 
 Compare a metric's statistics between two time periods.
